@@ -104,7 +104,7 @@ const uint8_t* configuration_descriptors[] = {
 char const* string_desc_arr[] = {
     (const char[]){ 0x09, 0x04 },  // 0: Supported language is English (0x0409)
     "ZUOYA",                       // 1: Manufacturer
-    "ZUOYA GMK87",                 // 2: Product
+    "GMK87",                 // 2: Product
 };
 
 // Invoked when received GET DEVICE DESCRIPTOR
