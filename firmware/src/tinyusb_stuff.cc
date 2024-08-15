@@ -108,33 +108,9 @@ static const char* string_desc_arr[] = {
     "ZUOYA GMK87 XXXX",            // 2: Product
 };
 
-// Returns a pointer to the device descriptor.
-uint8_t const* tud_descriptor_device_cb() {
-    // Update Vendor ID and Product ID if they are set in our_descriptor.
-    if ((our_descriptor->vid != 0) && (our_descriptor->pid != 0)) {
-        desc_device.idVendor = our_descriptor->vid;
-        desc_device.idProduct = our_descriptor->pid;
-    }
-    return reinterpret_cast<uint8_t const*>(&desc_device);  // Return pointer to device descriptor.
-}
+static uint16_t _desc_str[32];
 
-// Invoked when received GET CONFIGURATION DESCRIPTOR
-uint8_t const* tud_descriptor_configuration_cb(uint8_t index) {
-    if (index < sizeof(configuration_descriptors) / sizeof(configuration_descriptors[0])) {
-        return configuration_descriptors[our_descriptor->idx];
-    }
-    return nullptr;  // Return nullptr if index is out of bounds
-}
-
-// Invoked when received GET HID REPORT DESCRIPTOR
-uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf) {
-    if (itf == 0) {
-        return our_descriptor ? our_descriptor->descriptor : nullptr;  // Return descriptor or nullptr
-    } else if (itf == 1) {
-        return config_report_descriptor;  // Return config report descriptor
-    }
-    return nullptr;  // Return nullptr for invalid interface
-}
+static const char id_chars[33] = "0123456789ABCDEFGHIJKLMNOPQRSTUV";
 
 // Invoked when received GET STRING DESCRIPTOR request
 uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
