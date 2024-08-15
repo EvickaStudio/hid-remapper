@@ -121,7 +121,10 @@ uint8_t const* tud_descriptor_device_cb() {
 // Application return pointer to descriptor
 // Descriptor contents must exist long enough for transfer to complete
 uint8_t const* tud_descriptor_configuration_cb(uint8_t index) {
-    return configuration_descriptors[our_descriptor->idx];
+    if (index < sizeof(configuration_descriptors) / sizeof(configuration_descriptors[0])) {
+        return configuration_descriptors[our_descriptor->idx];
+    }
+    return NULL;
 }
 
 // Invoked when received GET HID REPORT DESCRIPTOR
@@ -129,7 +132,11 @@ uint8_t const* tud_descriptor_configuration_cb(uint8_t index) {
 // Descriptor contents must exist long enough for transfer to complete
 uint8_t const* tud_hid_descriptor_report_cb(uint8_t itf) {
     if (itf == 0) {
-        return our_descriptor->descriptor;
+        if (our_descriptor != NULL) {
+            return our_descriptor->descriptor;
+        } else {
+            return NULL;
+        }
     } else if (itf == 1) {
         return config_report_descriptor;
     }
@@ -149,10 +156,11 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
     if (index == 0) {
         memcpy(&_desc_str[1], string_desc_arr[0], 2);
         chr_count = 1;
-    } else {
-        // Note: the 0xEE index string is a Microsoft OS 1.0 Descriptors.
+    } else if (index == 0xEE) {
+        // Handle the 0xEE index string for Microsoft OS 1.0 Descriptors.
         // https://docs.microsoft.com/en-us/windows-hardware/drivers/usbcon/microsoft-defined-usb-descriptors
-
+        return NULL; // or handle accordingly if you have a specific string for 0xEE
+    } else {
         if (!(index < sizeof(string_desc_arr) / sizeof(string_desc_arr[0])))
             return NULL;
 
@@ -165,13 +173,13 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid) {
 
         // Convert ASCII string into UTF-16
         for (uint8_t i = 0; i < chr_count; i++) {
-            _desc_str[1 + i] = str[i];
+            _desc_str[1 + i] = (uint16_t)str[i];
         }
 
         if (index == 2) {
             uint64_t unique_id = get_unique_id();
             for (uint8_t i = 0; i < 4; i++) {
-                _desc_str[1 + chr_count - 4 + i] = id_chars[(unique_id >> (15 - i * 5)) & 0x1F];
+                _desc_str[1 + chr_count - 4 + i] = id_chars[(unique_id >> (i * 5)) & 0x1F];
             }
         }
     }
