@@ -32,10 +32,9 @@
 #include "platform.h"
 #include "remapper.h"
 
-// These IDs are bogus. If you want to distribute any hardware using this,
-// you will have to get real ones.
-#define USB_VID 0xCAFE
-#define USB_PID 0xBAF2
+// These IDs and data are from the ZUOYA GMK87 keyboard, for testing purposes only.
+#define USB_VID 0x320F  // Vendor ID
+#define USB_PID 0x5055  // Product ID
 
 tusb_desc_device_t desc_device = {
     .bLength = sizeof(tusb_desc_device_t),
@@ -48,7 +47,7 @@ tusb_desc_device_t desc_device = {
 
     .idVendor = USB_VID,
     .idProduct = USB_PID,
-    .bcdDevice = 0x0100,
+    .bcdDevice = 0x0105,
 
     .iManufacturer = 0x01,
     .iProduct = 0x02,
@@ -103,9 +102,9 @@ const uint8_t* configuration_descriptors[] = {
 };
 
 char const* string_desc_arr[] = {
-    (const char[]){ 0x09, 0x04 },  // 0: is supported language is English (0x0409)
-    "RP2040",                      // 1: Manufacturer
-    "HID Remapper XXXX",           // 2: Product
+    (const char[]){ 0x09, 0x04 },  // 0: Supported language is English (0x0409)
+    "ZUOYA",                       // 1: Manufacturer
+    "ZUOYA GMK87",                 // 2: Product
 };
 
 // Invoked when received GET DEVICE DESCRIPTOR
